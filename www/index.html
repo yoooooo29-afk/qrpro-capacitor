@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Professional QR Code Scanner & Generator with AdMob">
+
+  <title>QR Pro - Scanner & Generator</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+  <div id="splash" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <span class="material-icons-round splash-icon">qr_code_scanner</span>
+      </div>
+      <h1>QR Pro</h1>
+      <p class="splash-subtitle">Scanner & Generator</p>
+      <div class="splash-loader">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="app" class="app-container hidden">
+    <header class="top-bar">
+      <h1 class="app-title">
+        <span class="material-icons-round title-icon">qr_code_scanner</span> QR Pro
+      </h1>
+      <div class="top-actions">
+        <button id="theme-toggle" class="icon-btn" title="Toggle theme">
+          <span class="material-icons-round">dark_mode</span>
+        </button>
+        <button id="settings-btn" class="icon-btn" title="Settings">
+          <span class="material-icons-round">settings</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="main-content" class="main-content">
+      <section id="home-screen" class="screen active">
+        <div class="welcome-section">
+          <h2>Welcome to QR Pro! 👋</h2>
+          <p>Scan any QR code or create your own in seconds</p>
+        </div>
+
+        <div class="quick-actions">
+          <button class="action-card primary" id="quick-scan">
+            <span class="material-icons-round action-icon">photo_camera</span>
+            <span class="action-text">Scan QR Code</span>
+            <span class="action-desc">Use camera to scan</span>
+          </button>
+          <button class="action-card secondary" id="quick-generate">
+            <span class="material-icons-round action-icon">qr_code_2</span>
+            <span class="action-text">Create QR Code</span>
+            <span class="action-desc">Generate custom codes</span>
+          </button>
+        </div>
+
+        <div class="secondary-actions">
+          <button class="action-chip" id="quick-image-scan">
+            <span class="material-icons-round">image</span> Scan from Image
+          </button>
+          <button class="action-chip" id="quick-paste-scan">
+            <span class="material-icons-round">content_paste</span> Paste & Scan
+          </button>
+          <button class="action-chip" id="quick-upi">
+            <span class="material-icons-round">payments</span> UPI Payment
+          </button>
+          <button class="action-chip" id="quick-wifi">
+            <span class="material-icons-round">wifi</span> WiFi QR
+          </button>
+        </div>
+
+        <div class="recent-section">
+          <div class="section-header">
+            <h3>Recent Activity</h3>
+            <button class="text-btn" id="view-all-history">View All</button>
+          </div>
+          <div id="recent-list" class="recent-list">
+            <div class="empty-state">
+              <span class="material-icons-round empty-icon">history</span>
+              <p>No recent activity</p>
+              <span class="empty-hint">Your scans and generations will appear here</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scanner-screen" class="screen">
+        <div class="screen-header">
+          <button class="back-btn" id="scanner-back">
+            <span class="material-icons-round">arrow_back</span>
+          </button>
+          <h2>Scan QR Code</h2>
+          <div class="header-spacer"></div>
+        </div>
+
+        <div class="scanner-container">
+          <div id="scanner-view" class="scanner-view">
+            <div class="scanner-overlay">
+              <div class="scanner-frame">
+                <div class="corner top-left"></div>
+                <div class="corner top-right"></div>
+                <div class="corner bottom-left"></div>
+                <div class="corner bottom-right"></div>
+              </div>
+              <div class="scan-line"></div>
+              <p class="scanner-hint">Point camera at a QR code</p>
+            </div>
+          </div>
+          <div id="reader" class="qr-reader"></div>
+        </div>
+
+        <div class="scanner-controls">
+          <button class="control-btn" id="camera-switch" title="Switch Camera">
+            <span class="material-icons-round">flip_camera_ios</span>
+          </button>
+          <button class="control-btn active" id="camera-toggle" title="Start/Stop">
+            <span class="material-icons-round">photo_camera</span>
+          </button>
+          <button class="control-btn" id="flash-toggle" title="Flashlight">
+            <span class="material-icons-round">flash_off</span>
+          </button>
+        </div>
+
+        <div class="scan-options">
+          <button class="option-btn" id="scan-from-file">
+            <span class="material-icons-round">folder_open</span> Upload Image
+          </button>
+          <button class="option-btn" id="scan-from-clipboard">
+            <span class="material-icons-round">content_paste_go</span> Paste Image
+          </button>
+        </div>
+
+        <input type="file" id="file-input" accept="image/*" hidden>
+      </section>
+
+      <section id="result-screen" class="screen">
+        <div class="screen-header">
+          <button class="back-btn" id="result-back">
+            <span class="material-icons-round">arrow_back</span>
+          </button>
+          <h2>Scan Result</h2>
+          <div class="header-spacer"></div>
+        </div>
+
+        <div class="result-container">
+          <div class="result-type-badge">
+            <span class="material-icons-round" id="result-type-icon">link</span>
+            <span id="result-type-text">URL</span>
+          </div>
+          <div class="result-content-card">
+            <img id="result-thumbnail" class="result-thumbnail" src="" alt="Scanned QR Code" hidden>
+            <div class="result-data" id="result-data"></div>
+          </div>
+          <div class="result-actions" id="result-actions"></div>
+          <div class="result-meta" id="result-meta"></div>
+        </div>
+      </section>
+
+      <section id="generator-screen" class="screen">
+        <div class="screen-header">
+          <button class="back-btn" id="generator-back">
+            <span class="material-icons-round">arrow_back</span>
+          </button>
+          <h2>Create QR Code</h2>
+          <div class="header-spacer"></div>
+        </div>
+
+        <div class="type-selector">
+          <div class="type-scroll">
+            <button class="type-btn active" data-type="url">
+              <span class="material-icons-round">link</span><span>URL</span>
+            </button>
+            <button class="type-btn" data-type="text">
+              <span class="material-icons-round">text_fields</span><span>Text</span>
+            </button>
+            <button class="type-btn" data-type="wifi">
+              <span class="material-icons-round">wifi</span><span>WiFi</span>
+            </button>
+            <button class="type-btn" data-type="vcard">
+              <span class="material-icons-round">person</span><span>Contact</span>
+            </button>
+            <button class="type-btn" data-type="email">
+              <span class="material-icons-round">email</span><span>Email</span>
+            </button>
+            <button class="type-btn" data-type="phone">
+              <span class="material-icons-round">phone</span><span>Phone</span>
+            </button>
+            <button class="type-btn" data-type="sms">
+              <span class="material-icons-round">sms</span><span>SMS</span>
+            </button>
+            <button class="type-btn" data-type="location">
+              <span class="material-icons-round">location_on</span><span>Location</span>
+            </button>
+            <button class="type-btn" data-type="upi">
+              <span class="material-icons-round">payments</span><span>UPI</span>
+            </button>
+            <button class="type-btn" data-type="event">
+              <span class="material-icons-round">event</span><span>Event</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="input-section">
+          <div class="form-panel active" id="form-url">
+            <div class="form-group">
+              <label>Website URL</label>
+              <input type="url" id="url-input" placeholder="https://example.com" autocomplete="off">
+              <span class="char-count"><span id="url-count">0</span>/2953</span>
+            </div>
+            <div class="form-hint">💡 https:// will be added automatically if missing</div>
+          </div>
+
+          <div class="form-panel" id="form-text">
+            <div class="form-group">
+              <label>Your Text</label>
+              <textarea id="text-input" placeholder="Enter any text..." rows="4"></textarea>
+              <span class="char-count"><span id="text-count">0</span>/2953</span>
+            </div>
+          </div>
+
+          <div class="form-panel" id="form-wifi">
+            <div class="form-group">
+              <label>Network Name (SSID)</label>
+              <input type="text" id="wifi-ssid" placeholder="MyWiFiNetwork">
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <div class="password-input">
+                <input type="password" id="wifi-password" placeholder="Enter password">
+                <button type="button" class="toggle-password" id="wifi-pass-toggle">
+                  <span class="material-icons-round">visibility_off</span>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Encryption</label>
+              <select id="wifi-encryption">
+                <option value="WPA">WPA/WPA2 (Recommended)</option>
+                <option value="WEP">WEP</option>
+                <option value="nopass">No Password (Open)</option>
+              </select>
+            </div>
+            <label class="checkbox-label">
+              <input type="checkbox" id="wifi-hidden"> Hidden Network
+            </label>
+          </div>
+
+          <div class="form-panel" id="form-vcard">
+            <div class="form-group">
+              <label>Full Name *</label>
+              <input type="text" id="vcard-name" placeholder="John Doe">
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="vcard-phone" placeholder="+91 9876543210">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="vcard-email" placeholder="john@example.com">
+            </div>
+            <div class="form-group">
+              <label>Organization</label>
+              <input type="text" id="vcard-org" placeholder="Company Name">
+            </div>
+            <div class="form-group">
+              <label>Website</label>
+              <input type="url" id="vcard-url" placeholder="https://example.com">
+            </div>
+            <div class="form-group">
+              <label>Address</label>
+              <input type="text" id="vcard-address" placeholder="Street, City, State">
+            </div>
+          </div>
+
+          <div class="form-panel" id="form-email">
+            <div class="form-group">
+              <label>Recipient Email *</label>
+              <input type="email" id="email-to" placeholder="recipient@example.com">
+            </div>
+            <div class="form-group">
+              <label>Subject</label>
+              <input type="text" id="email-subject" placeholder="Email subject">
+            </div>
+            <div class="form-group">
+              <label>Message Body</label>
+              <textarea id="email-body" placeholder="Your message..." rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-panel" id="form-phone">
+            <div class="form-group">
+              <label>Phone Number *</label>
+              <input type="tel" id="phone-number" placeholder="+91 9876543210">
+              <span class="form-hint">Include country code for international numbers</span>
+            </div>
+          </div>
+
+          <div class="form-panel" id="form-sms">
+            <div class="form-group">
+              <label>Phone Number *</label>
+              <input type="tel" id="sms-phone" placeholder="+91 9876543210">
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea id="sms-body" placeholder="Your SMS message..." rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-panel" id="form-location">
+            <div class="form-group">
+              <label>Latitude</label>
+              <input type="number" id="loc-lat" placeholder="28.6139" step="any">
+            </div>
+            <div class="form-group">
+              <label>Longitude</label>
+              <input type="number" id="loc-lng" placeholder="77.2090" step="any">
+            </div>
+            <div class="form-group">
+              <label>Place Name (Optional)</label>
+              <input type="text" id="loc-name" placeholder="India Gate, New Delhi">
+            </div>
+            <button class="secondary-btn" id="get-location-btn">
+              <span class="material-icons-round">my_location</span> Use My Current Location
+            </button>
+          </div>
+
+          <div class="form-panel" id="form-upi">
+            <div class="form-group">
+              <label>UPI ID / VPA *</label>
+              <input type="text" id="upi-id" placeholder="yourname@paytm">
+              <span class="form-hint">Example: username@upi, username@paytm, username@ybl</span>
+            </div>
+            <div class="form-group">
+              <label>Payee Name</label>
+              <input type="text" id="upi-name" placeholder="Your Name">
+            </div>
+            <div class="form-group">
+              <label>Amount (₹, Optional)</label>
+              <input type="number" id="upi-amount" placeholder="0.00" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Transaction Note (Optional)</label>
+              <input type="text" id="upi-note" placeholder="Payment for...">
+            </div>
+          </div>
+
+          <div class="form-panel" id="form-event">
+            <div class="form-group">
+              <label>Event Title *</label>
+              <input type="text" id="event-title" placeholder="Team Meeting">
+            </div>
+            <div class="form-group">
+              <label>Start Date & Time</label>
+              <input type="datetime-local" id="event-start">
+            </div>
+            <div class="form-group">
+              <label>End Date & Time</label>
+              <input type="datetime-local" id="event-end">
+            </div>
+            <div class="form-group">
+              <label>Location</label>
+              <input type="text" id="event-location" placeholder="Conference Room A">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="event-desc" placeholder="Event details..." rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="design-section" id="design-section">
+          <details class="design-details">
+            <summary>
+              <span class="material-icons-round">palette</span> Customize Design
+            </summary>
+            <div class="design-options">
+              <div class="color-row">
+                <div class="form-group">
+                  <label>Foreground Color</label>
+                  <div class="color-picker-wrap">
+                    <input type="color" id="fg-color" value="#000000">
+                    <input type="text" id="fg-color-text" value="#000000" maxlength="7">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Background Color</label>
+                  <div class="color-picker-wrap">
+                    <input type="color" id="bg-color" value="#ffffff">
+                    <input type="text" id="bg-color-text" value="#ffffff" maxlength="7">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Error Correction Level</label>
+                <select id="error-correction">
+                  <option value="L">Low (7% recovery)</option>
+                  <option value="M" selected>Medium (15%)</option>
+                  <option value="Q">Quartile (25%)</option>
+                  <option value="H">High (30%) - Best for logos</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>QR Code Size</label>
+                <select id="qr-size">
+                  <option value="150">Small (150x150px)</option>
+                  <option value="256" selected>Medium (256x256px)</option>
+                  <option value="400">Large (400x400px)</option>
+                  <option value="800">Extra Large (800x800px)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Margin (Quiet Zone)</label>
+                <input type="range" id="qr-margin" min="0" max="10" value="4">
+                <span class="range-value" id="margin-value">4</span>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="preview-section">
+          <h3>Preview</h3>
+          <div class="preview-container" id="preview-container">
+            <canvas id="qr-preview-canvas"></canvas>
+            <div class="preview-placeholder" id="preview-placeholder">
+              <span class="material-icons-round">qr_code_2</span>
+              <p>Your QR code will appear here</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="generate-actions">
+          <button class="btn-generate" id="btn-generate">
+            <span class="material-icons-round">qr_code_2</span> Generate QR Code
+          </button>
+        </div>
+      </section>
+
+      <section id="generated-screen" class="screen">
+        <div class="screen-header">
+          <button class="back-btn" id="generated-back">
+            <span class="material-icons-round">arrow_back</span>
+          </button>
+          <h2>Your QR Code</h2>
+          <div class="header-spacer"></div>
+        </div>
+
+        <div class="generated-container">
+          <div class="generated-card">
+            <canvas id="generated-canvas" class="generated-canvas"></canvas>
+            <div class="generated-info" id="generated-info"></div>
+          </div>
+
+          <div class="download-options">
+            <h3>Download As</h3>
+            <div class="download-btns">
+              <button class="dl-btn" data-format="png">
+                <span class="material-icons-round">image</span> PNG
+              </button>
+              <button class="dl-btn" data-format="jpeg">
+                <span class="material-icons-round">photo</span> JPEG
+              </button>
+              <button class="dl-btn" data-format="svg">
+                <span class="material-icons-round">code</span> SVG
+              </button>
+            </div>
+          </div>
+
+          <div class="share-actions">
+            <button class="btn-share" id="btn-share-qr">
+              <span class="material-icons-round">share</span> Share
+            </button>
+            <button class="btn-secondary" id="btn-download-all">
+              <span class="material-icons-round">download</span> Download
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="history-screen" class="screen">
+        <div class="screen-header">
+          <button class="back-btn" id="history-back">
+            <span class="material-icons-round">arrow_back</span>
+          </button>
+          <h2>History</h2>
+          <div class="header-spacer"></div>
+        </div>
+
+        <div class="history-controls">
+          <div class="search-box">
+            <span class="material-icons-round search-icon">search</span>
+            <input type="text" id="history-search" placeholder="Search history...">
+          </div>
+          <div class="filter-row">
+            <select id="history-filter">
+              <option value="all">All Types</option>
+              <option value="scan">Scans Only</option>
+              <option value="generate">Generations Only</option>
+              <option value="url">URLs</option>
+              <option value="text">Text</option>
+              <option value="wifi">WiFi</option>
+              <option value="vcard">Contacts</option>
+              <option value="upi">UPI Payments</option>
+            </select>
+            <select id="history-sort">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="history-list" class="history-list">
+          <div class="empty-state" id="history-empty">
+            <span class="material-icons-round empty-icon">history</span>
+            <p>No history yet</p>
+            <span class="empty-hint">Your scans and QR codes will be saved here</span>
+          </div>
+        </div>
+
+        <div class="history-actions" id="history-actions" hidden>
+          <button class="action-chip danger" id="clear-history">
+            <span class="material-icons-round">delete_sweep</span> Clear All
+          </button>
+          <button class="action-chip" id="export-history">
+            <span class="material-icons-round">download</span> Export CSV
+          </button>
+        </div>
+      </section>
+
+      <section id="settings-screen" class="screen">
+        <div class="screen-header">
+          <button class="back-btn" id="settings-back">
+            <span class="material-icons-round">arrow_back</span>
+          </button>
+          <h2>Settings</h2>
+          <div class="header-spacer"></div>
+        </div>
+
+        <div class="settings-container">
+          <div class="settings-group">
+            <h3>Appearance</h3>
+            <div class="setting-item">
+              <span class="setting-label">Dark Mode</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-dark-mode" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Scan Sound</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-scan-sound" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Vibrate on Scan</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-vibrate" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Scanner</h3>
+            <div class="setting-item">
+              <span class="setting-label">Auto-Copy to Clipboard</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-auto-copy">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Confirm Before Opening URLs</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-url-confirm" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Generator</h3>
+            <div class="setting-item">
+              <span class="setting-label">Auto-Save Generated Codes</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-auto-save" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Default Format</span>
+              <select id="setting-default-format">
+                <option value="png">PNG</option>
+                <option value="svg">SVG</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Privacy</h3>
+            <div class="setting-item">
+              <span class="setting-label">Save History</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-save-history" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Incognito Mode (No History)</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-incognito">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Ads & Monetization</h3>
+            <div class="setting-item">
+              <span class="setting-label">Show Banner Ads</span>
+              <label class="switch">
+                <input type="checkbox" id="setting-show-ads" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="ad-info">
+              <span class="material-icons-round">info</span>
+              <p>Ads help support free development. Non-intrusive banner ads.</p>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Data</h3>
+            <button class="settings-btn" id="export-all-data">
+              <span class="material-icons-round">download</span> Export All Data (JSON)
+            </button>
+            <button class="settings-btn danger" id="clear-all-data">
+              <span class="material-icons-round">delete_forever</span> Clear All Data
+            </button>
+          </div>
+
+          <div class="settings-group">
+            <h3>About</h3>
+            <div class="about-info">
+              <p><strong>QR Pro</strong> v1.0.0</p>
+              <p>Professional QR Code Scanner & Generator</p>
+              <p>Built for speed and simplicity</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="url-confirm-dialog" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="material-icons-round warning-icon">warning_amber</span>
+            <h3>Open this link?</h3>
+          </div>
+          <div class="modal-body">
+            <p class="url-preview" id="confirm-url"></p>
+            <p class="url-safety-hint">Make sure this is a trusted URL before opening</p>
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn cancel" id="confirm-cancel">Cancel</button>
+            <button class="modal-btn primary" id="confirm-open">Open Link</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="toast" class="toast hidden">
+        <span class="material-icons-round toast-icon" id="toast-icon">check_circle</span>
+        <span id="toast-message">Success!</span>
+      </div>
+
+      <div id="admob-banner" class="ad-banner">
+        <div class="ad-placeholder">
+          <span class="material-icons-round">ad_units</span>
+          <p>Ad Banner Space</p>
+          <span class="ad-note">AdMob banner will appear here on mobile</span>
+        </div>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-screen="home-screen">
+        <span class="material-icons-round">home</span><span>Home</span>
+      </button>
+      <button class="nav-item" data-screen="scanner-screen">
+        <span class="material-icons-round">photo_camera</span><span>Scan</span>
+      </button>
+      <button class="nav-item" data-screen="generator-screen">
+        <span class="material-icons-round">qr_code_2</span><span>Create</span>
+      </button>
+      <button class="nav-item" data-screen="history-screen">
+        <span class="material-icons-round">history</span><span>History</span>
+      </button>
+      <button class="nav-item" data-screen="settings-screen">
+        <span class="material-icons-round">settings</span><span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <input type="file" id="scan-file-input" accept="image/*" hidden>
+
+  <!-- Libraries must load before app.js -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="js/admob.js?v=final-unique-20260611"></script>
+<script src="js/app-qrfix4.js?v=final-unique-20260611"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a09fda165ee7ff9b',t:'MTc4MTE3Mjg5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
